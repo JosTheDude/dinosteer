@@ -31,7 +31,7 @@ export function sanitizeForLog(input: unknown): unknown {
 
 // stdio transport reserves stdout for JSON-RPC; all diagnostics must go to stderr.
 function write(level: string, message: string, meta?: unknown): void {
-  const parts = [`[pterodactyl-mcp] [${level}] ${redact(message)}`];
+  const parts = [`[dinosteer] [${level}] ${redact(message)}`];
   if (meta !== undefined) {
     parts.push(JSON.stringify(sanitizeForLog(meta)));
   }
@@ -43,6 +43,6 @@ export const logger = {
   warn: (message: string, meta?: unknown) => write("warn", message, meta),
   error: (message: string, meta?: unknown) => write("error", message, meta),
   debug: (message: string, meta?: unknown) => {
-    if (process.env.PTERODACTYL_MCP_DEBUG) write("debug", message, meta);
+    if (process.env.DINOSTEER_DEBUG) write("debug", message, meta);
   },
 };

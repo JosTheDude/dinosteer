@@ -1,15 +1,15 @@
 {
-  "name": "pterodactyl-mcp",
+  "name": "dinosteer",
   "version": "0.1.0",
-  "description": "MCP server for interacting with multiple Pterodactyl panel instances (Client + Application API)",
+  "description": "Dinosteer — MCP server for interacting with multiple Pterodactyl panel instances (Client + Application API)",
   "type": "module",
   "bin": {
-    "pterodactyl-mcp": "./dist/index.js"
+    "dinosteer": "./dist/index.js"
   },
   "main": "./dist/index.js",
   "files": [
     "dist",
-    "pterodactyl-mcp.config.example.yaml",
+    "dinosteer.config.example.yaml",
     "README.md"
   ],
   "scripts": {

@@ -10,15 +10,22 @@ export class ConfigError extends Error {}
 const ENV_VAR_PATTERN = /\$\{([A-Z0-9_]+)\}/g;
 
 function interpolateEnv(raw: string): string {
-  return raw.replace(ENV_VAR_PATTERN, (match, varName: string) => {
-    const value = process.env[varName];
-    if (value === undefined) {
-      throw new ConfigError(
-        `Config references \${${varName}} but that environment variable is not set.`
-      );
-    }
-    return value;
-  });
+  return raw
+    .split("\n")
+    .map((line) => {
+      const trimmed = line.trimStart();
+      if (trimmed.startsWith("#")) return line; // don't interpolate inside comments
+      return line.replace(ENV_VAR_PATTERN, (match, varName: string) => {
+        const value = process.env[varName];
+        if (value === undefined) {
+          throw new ConfigError(
+            `Config references \${${varName}} but that environment variable is not set.`
+          );
+        }
+        return value;
+      });
+    })
+    .join("\n");
 }
 
 function resolveConfigPath(explicitPath?: string): string {
@@ -29,19 +36,19 @@ function resolveConfigPath(explicitPath?: string): string {
     return process.argv[argIndex + 1];
   }
 
-  if (process.env.PTERODACTYL_MCP_CONFIG) {
-    return process.env.PTERODACTYL_MCP_CONFIG;
+  if (process.env.DINOSTEER_CONFIG) {
+    return process.env.DINOSTEER_CONFIG;
   }
 
-  const cwdCandidate = join(process.cwd(), "pterodactyl-mcp.config.yaml");
+  const cwdCandidate = join(process.cwd(), "dinosteer.config.yaml");
   if (existsSync(cwdCandidate)) return cwdCandidate;
 
-  const homeCandidate = join(homedir(), ".config", "pterodactyl-mcp", "config.yaml");
+  const homeCandidate = join(homedir(), ".config", "dinosteer", "config.yaml");
   if (existsSync(homeCandidate)) return homeCandidate;
 
   throw new ConfigError(
-    "No config file found. Pass --config <path>, set PTERODACTYL_MCP_CONFIG, " +
-      "or create ./pterodactyl-mcp.config.yaml or ~/.config/pterodactyl-mcp/config.yaml"
+    "No config file found. Pass --config <path>, set DINOSTEER_CONFIG, " +
+      "or create ./dinosteer.config.yaml or ~/.config/dinosteer/config.yaml"
   );
 }
 

@@ -1,6 +1,6 @@
-# Copy this file to pterodactyl-mcp.config.yaml (or point PTERODACTYL_MCP_CONFIG / --config at your
-# own copy) and fill in real values. ${VAR_NAME} is interpolated from environment variables at
-# startup, so you can keep actual API keys out of this file entirely.
+# Copy this file to dinosteer.config.yaml (or point DINOSTEER_CONFIG / --config at your
+# own copy) and fill in real values. ${VAR_NAME}-style values are interpolated from environment
+# variables at startup, so you can keep actual API keys out of this file entirely.
 
 defaultPanel: prismnodes
 

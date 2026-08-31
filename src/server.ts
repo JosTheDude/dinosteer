@@ -4,7 +4,7 @@ import { registerAllTools } from "./tools/registerAll.js";
 
 export function createServer(config: Config): McpServer {
   const server = new McpServer({
-    name: "pterodactyl-mcp",
+    name: "dinosteer",
     version: "0.1.0",
   });
 

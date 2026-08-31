@@ -1,4 +1,4 @@
-# pterodactyl-mcp
+# Dinosteer
 
 An MCP server that lets AI agents interact with multiple [Pterodactyl](https://pterodactyl.io/)
 panel instances — files, console, backups, databases, schedules, subusers (Client API), and
@@ -13,7 +13,7 @@ npm run build
 
 ## Configure
 
-Copy `pterodactyl-mcp.config.example.yaml` to `pterodactyl-mcp.config.yaml` (or any path) and fill
+Copy `dinosteer.config.example.yaml` to `dinosteer.config.yaml` (or any path) and fill
 in your panels. `${VAR_NAME}` placeholders are interpolated from environment variables at startup,
 so you can keep real API keys in your shell/secret manager instead of the file:
 
@@ -29,8 +29,8 @@ panels:
     clientApiKey: "${STARNOVA_CLIENT_KEY}"
 ```
 
-Config file resolution order: `--config <path>` → `PTERODACTYL_MCP_CONFIG` env var →
-`./pterodactyl-mcp.config.yaml` → `~/.config/pterodactyl-mcp/config.yaml`.
+Config file resolution order: `--config <path>` → `DINOSTEER_CONFIG` env var →
+`./dinosteer.config.yaml` → `~/.config/dinosteer/config.yaml`.
 
 Each panel needs a **Client API key** (per-account, from a panel user's account settings) and/or
 an **Application API key** (admin-only, from the panel's admin settings). A panel without an
@@ -41,7 +41,7 @@ application key simply won't expose the `admin_*` tools for that panel.
 Point your MCP client at the built entrypoint, e.g. in Claude Code:
 
 ```bash
-claude mcp add pterodactyl -- node /path/to/pterodactyl-mcp/dist/index.js --config /path/to/pterodactyl-mcp.config.yaml
+claude mcp add dinosteer -- node /path/to/dinosteer/dist/index.js --config /path/to/dinosteer.config.yaml
 ```
 
 Or in a `.mcp.json` / Claude Desktop config:
@@ -49,9 +49,9 @@ Or in a `.mcp.json` / Claude Desktop config:
 ```json
 {
   "mcpServers": {
-    "pterodactyl": {
+    "dinosteer": {
       "command": "node",
-      "args": ["/path/to/pterodactyl-mcp/dist/index.js", "--config", "/path/to/pterodactyl-mcp.config.yaml"]
+      "args": ["/path/to/dinosteer/dist/index.js", "--config", "/path/to/dinosteer.config.yaml"]
     }
   }
 }
@@ -98,7 +98,7 @@ following the same per-resource module pattern under `src/tools/`.
 ## Security notes
 
 - Never commit a config file with literal API keys — use `${VAR}` interpolation and keep secrets
-  in your shell/secret manager. `pterodactyl-mcp.config.yaml` is gitignored by default.
+  in your shell/secret manager. `dinosteer.config.yaml` is gitignored by default.
 - Grant each panel only the API key surface you actually want exposed: omit `applicationApiKey`
   on panels where admin-level tools shouldn't be available.
 - Logs go to stderr only (required for stdio transport) and redact API key material automatically.
