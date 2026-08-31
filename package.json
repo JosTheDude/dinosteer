@@ -1,0 +1,39 @@
+{
+  "name": "pterodactyl-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for interacting with multiple Pterodactyl panel instances (Client + Application API)",
+  "type": "module",
+  "bin": {
+    "pterodactyl-mcp": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "pterodactyl-mcp.config.example.yaml",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "undici": "^6.19.8",
+    "ws": "^8.18.0",
+    "yaml": "^2.5.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.15",
+    "@types/ws": "^8.5.12",
+    "tsx": "^4.19.1",
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.1"
+  },
+  "engines": {
+    "node": ">=18.17"
+  }
+}

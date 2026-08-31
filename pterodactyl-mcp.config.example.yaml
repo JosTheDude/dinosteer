@@ -1,0 +1,17 @@
+# Copy this file to pterodactyl-mcp.config.yaml (or point PTERODACTYL_MCP_CONFIG / --config at your
+# own copy) and fill in real values. ${VAR_NAME} is interpolated from environment variables at
+# startup, so you can keep actual API keys out of this file entirely.
+
+defaultPanel: prismnodes
+
+panels:
+  - name: prismnodes
+    baseUrl: https://panel.prismnodes.net
+    clientApiKey: "${PRISMNODES_CLIENT_KEY}"
+    # Optional: omit to disable all admin_* tools for this panel.
+    applicationApiKey: "${PRISMNODES_APP_KEY}"
+
+  - name: starnova
+    baseUrl: https://panel.starnova.gg
+    clientApiKey: "${STARNOVA_CLIENT_KEY}"
+    # No applicationApiKey configured here -> admin_* tools are unavailable for "starnova".
