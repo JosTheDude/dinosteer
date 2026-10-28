@@ -138,4 +138,38 @@ export function registerAdminNodeTools(server: McpServer, ctx: ToolContext): voi
       return textResult(`Created ${ports.length} allocation(s) on node ${nodeId} for ${ip}.`);
     })
   );
+
+  server.tool(
+    "admin_delete_node_allocation",
+    "[Admin] Delete an unassigned allocation from a node. Requires confirm:true.",
+    { panel: panelField, nodeId: nodeIdField, allocationId: z.number().int(), confirm: confirmField },
+    withToolErrorHandling(async ({ panel, nodeId, allocationId, confirm }) => {
+      assertConfirmed(confirm, `This will delete allocation ${allocationId} from node ${nodeId}.`);
+      const client = resolvePanel(ctx.config, panel);
+      await client.request(`/nodes/${nodeId}/allocations/${allocationId}`, {
+        surface: "application",
+        method: "DELETE",
+      });
+      return textResult(`Deleted allocation ${allocationId} from node ${nodeId}.`);
+    })
+  );
+
+  server.tool(
+    "admin_list_deployable_nodes",
+    "[Admin] List nodes with enough free memory/disk (MiB) to deploy a new server.",
+    {
+      panel: panelField,
+      memory: z.number().int().min(0),
+      disk: z.number().int().min(0),
+      locationIds: z.array(z.number().int()).optional(),
+      page: z.number().int().positive().optional(),
+    },
+    withToolErrorHandling(async ({ panel, memory, disk, locationIds, page }) => {
+      const client = resolvePanel(ctx.config, panel);
+      const query: Record<string, string | number | undefined> = { memory, disk, page };
+      locationIds?.forEach((id, i) => (query[`location_ids[${i}]`] = id));
+      const data = await client.request(`/nodes/deployable`, { surface: "application", query });
+      return jsonResult(data);
+    })
+  );
 }

@@ -6,6 +6,10 @@ export const PanelConfigSchema = z
       .string()
       .regex(/^[a-z0-9_-]+$/i, "panel name may only contain letters, numbers, - and _"),
     baseUrl: z.string().url(),
+    flavor: z
+      .enum(["pterodactyl", "hydrodactyl"])
+      .default("pterodactyl")
+      .describe("Panel software. Use hydrodactyl for Hydrodactyl and its forks (e.g. Novadactyl)."),
     clientApiKey: z.string().min(1).optional(),
     applicationApiKey: z.string().min(1).optional(),
     timeoutMs: z.number().int().positive().default(15000),

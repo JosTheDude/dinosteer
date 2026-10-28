@@ -13,5 +13,7 @@ panels:
 
   - name: starnova
     baseUrl: https://panel.starnova.gg
+    # Hydrodactyl or a fork of it (e.g. Novadactyl). Defaults to pterodactyl when omitted.
+    flavor: hydrodactyl
     clientApiKey: "${STARNOVA_CLIENT_KEY}"
     # No applicationApiKey configured here -> admin_* tools are unavailable for "starnova".

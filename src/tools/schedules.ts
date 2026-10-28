@@ -155,4 +155,42 @@ export function registerScheduleTools(server: McpServer, ctx: ToolContext): void
       return textResult(`Deleted task ${taskId} from schedule ${scheduleId}.`);
     })
   );
+
+  server.tool(
+    "execute_schedule",
+    "Run a schedule immediately, regardless of its cron timing.",
+    { panel: panelField, serverId: serverIdField, scheduleId: scheduleIdField },
+    withToolErrorHandling(async ({ panel, serverId, scheduleId }) => {
+      const client = resolvePanel(ctx.config, panel);
+      await client.request(`/servers/${serverId}/schedules/${scheduleId}/execute`, {
+        surface: "client",
+        method: "POST",
+      });
+      return textResult(`Triggered schedule ${scheduleId} on server ${serverId}.`);
+    })
+  );
+
+  server.tool(
+    "update_schedule_task",
+    "Update an existing task in a schedule.",
+    {
+      panel: panelField,
+      serverId: serverIdField,
+      scheduleId: scheduleIdField,
+      taskId: z.number().int(),
+      action: z.enum(["command", "power", "backup"]),
+      payload: z.string().optional(),
+      timeOffset: z.number().int().min(0).default(0),
+      continueOnFailure: z.boolean().optional(),
+    },
+    withToolErrorHandling(async ({ panel, serverId, scheduleId, taskId, action, payload, timeOffset, continueOnFailure }) => {
+      const client = resolvePanel(ctx.config, panel);
+      const data = await client.request(`/servers/${serverId}/schedules/${scheduleId}/tasks/${taskId}`, {
+        surface: "client",
+        method: "POST",
+        body: { action, payload, time_offset: timeOffset, continue_on_failure: continueOnFailure },
+      });
+      return jsonResult(data);
+    })
+  );
 }

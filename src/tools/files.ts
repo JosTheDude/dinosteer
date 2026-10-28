@@ -187,4 +187,47 @@ export function registerFileTools(server: McpServer, ctx: ToolContext): void {
       return jsonResult(data);
     })
   );
+
+  server.tool(
+    "chmod_files",
+    "Change permissions (octal mode, e.g. 755) of files on a server.",
+    {
+      panel: panelField,
+      serverId: serverIdField,
+      root: z.string().default("/"),
+      files: z.array(z.object({ file: z.string(), mode: z.string().regex(/^[0-7]{3,4}$/) })).min(1),
+    },
+    withToolErrorHandling(async ({ panel, serverId, root, files }) => {
+      const client = resolvePanel(ctx.config, panel);
+      await client.request(`/servers/${serverId}/files/chmod`, {
+        surface: "client",
+        method: "POST",
+        body: { root, files },
+      });
+      return textResult(`Updated permissions on ${files.length} file(s) in ${root}.`);
+    })
+  );
+
+  server.tool(
+    "pull_remote_file",
+    "Have the server's daemon download a file from a URL into the server's filesystem.",
+    {
+      panel: panelField,
+      serverId: serverIdField,
+      url: z.string().url(),
+      directory: z.string().default("/"),
+      filename: z.string().optional(),
+      useHeader: z.boolean().optional().describe("Use the filename from the Content-Disposition header"),
+      foreground: z.boolean().optional().describe("Wait for the download to finish before returning"),
+    },
+    withToolErrorHandling(async ({ panel, serverId, url, directory, filename, useHeader, foreground }) => {
+      const client = resolvePanel(ctx.config, panel);
+      await client.request(`/servers/${serverId}/files/pull`, {
+        surface: "client",
+        method: "POST",
+        body: { url, directory, filename, use_header: useHeader, foreground },
+      });
+      return textResult(`Started pulling ${url} into ${directory}.`);
+    })
+  );
 }

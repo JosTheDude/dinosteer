@@ -125,10 +125,21 @@ export function registerServerTools(server: McpServer, ctx: ToolContext): void {
       const client = resolvePanel(ctx.config, panel);
       await client.request(`/servers/${serverId}/settings/docker-image`, {
         surface: "client",
-        method: "POST",
+        method: "PUT",
         body: { docker_image: dockerImage },
       });
       return textResult(`Updated docker image for server ${serverId} to "${dockerImage}".`);
+    })
+  );
+
+  server.tool(
+    "get_server_activity",
+    "Get the activity log for a server.",
+    { panel: panelField, serverId: serverIdField, page: z.number().int().positive().optional() },
+    withToolErrorHandling(async ({ panel, serverId, page }) => {
+      const client = resolvePanel(ctx.config, panel);
+      const data = await client.request(`/servers/${serverId}/activity`, { surface: "client", query: { page } });
+      return jsonResult(data);
     })
   );
 }

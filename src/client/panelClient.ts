@@ -20,13 +20,22 @@ interface PterodactylErrorBody {
   errors?: PterodactylErrorDetail[];
 }
 
+// Hydrodactyl serves these server routes at /servers/{id}/...; everything else lives under /servers/{daemonType}/{id}/...
+const HYDRODACTYL_TOP_LEVEL_SERVER_ROUTES = /^\/(resources\/history|subdomain|webhook|marketplace)(\/|$)/;
+
 const keepAliveAgent = new Agent({ keepAliveTimeout: 10_000, keepAliveMaxTimeout: 30_000 });
 
 export class PanelClient {
+  private readonly daemonTypes = new Map<string, string>();
+
   constructor(private readonly panel: PanelConfig) {}
 
   get name(): string {
     return this.panel.name;
+  }
+
+  get flavor(): PanelConfig["flavor"] {
+    return this.panel.flavor;
   }
 
   hasApplicationKey(): boolean {
@@ -44,6 +53,10 @@ export class PanelClient {
         `Panel "${this.panel.name}" has no ${options.surface} API key configured; ` +
           `${options.surface === "application" ? "admin_*" : "this"} tools are unavailable for this panel.`
       );
+    }
+
+    if (this.panel.flavor === "hydrodactyl" && options.surface === "client") {
+      path = await this.hydrodactylServerPath(path);
     }
 
     const base = this.panel.baseUrl.replace(/\/+$/, "");
@@ -108,6 +121,30 @@ export class PanelClient {
     }
 
     return (text ? safeJsonParse(text) : undefined) as T;
+  }
+
+  /** Rewrites `/servers/{id}/...` to Hydrodactyl's `/servers/{daemonType}/{id}/...`, looking up (and caching) the daemon type. */
+  private async hydrodactylServerPath(path: string): Promise<string> {
+    const match = /^\/servers\/([^/]+)(\/.*)$/.exec(path);
+    if (!match) return path;
+    const [, serverId, rest] = match;
+    if (HYDRODACTYL_TOP_LEVEL_SERVER_ROUTES.test(rest)) return path;
+
+    let daemonType = this.daemonTypes.get(serverId);
+    if (!daemonType) {
+      const server = await this.request<{ attributes?: { daemon_type?: string }; meta?: { daemonType?: string } }>(
+        `/servers/${serverId}`,
+        { surface: "client" }
+      );
+      daemonType = server.meta?.daemonType ?? server.attributes?.daemon_type;
+      if (!daemonType) {
+        throw new PanelConfigurationError(
+          `Panel "${this.panel.name}" did not report a daemon type for server ${serverId}; is this panel really Hydrodactyl?`
+        );
+      }
+      this.daemonTypes.set(serverId, daemonType);
+    }
+    return `/servers/${daemonType}/${serverId}${rest}`;
   }
 }
 

@@ -95,4 +95,15 @@ export function registerAdminUserTools(server: McpServer, ctx: ToolContext): voi
       return textResult(`Deleted user ${userId}.`);
     })
   );
+
+  server.tool(
+    "admin_get_user_by_external_id",
+    "[Admin] Get a panel user by their external ID.",
+    { panel: panelField, externalId: z.string() },
+    withToolErrorHandling(async ({ panel, externalId }) => {
+      const client = resolvePanel(ctx.config, panel);
+      const data = await client.request(`/users/external/${externalId}`, { surface: "application" });
+      return jsonResult(data);
+    })
+  );
 }
