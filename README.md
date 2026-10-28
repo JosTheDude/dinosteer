@@ -6,10 +6,23 @@ panel-wide administration (Application API), across as many named panels as you 
 
 ## Install & build
 
+Requires Node.js 18.17+ to run (22.12+ to run the test suite).
+
 ```bash
 npm install
 npm run build
 ```
+
+## Develop & test
+
+```bash
+npm run dev        # run from source with tsx
+npm run typecheck
+npm test           # vitest
+```
+
+After pulling changes, re-run `npm run build` and restart your MCP client so it picks up the new
+`dist/` build.
 
 ## Configure
 
@@ -129,11 +142,18 @@ following the same per-resource module pattern under `src/tools/`.
   on panels where admin-level tools shouldn't be available.
 - Logs go to stderr only (required for stdio transport) and redact API key material automatically.
 
+- Keep dependencies patched: run `npm audit` and act on the repository's Dependabot alerts.
+
 ## Troubleshooting
 
 - **401/403 errors**: check the relevant API key's scope/permissions on that panel.
 - **"panel has no application API key configured"**: add `applicationApiKey` to that panel's
   config entry, or avoid calling `admin_*` tools against it.
+- **404s on every server tool against a Hydrodactyl/Novadactyl panel**: set `flavor: hydrodactyl` on
+  that panel. A `400` mentioning a daemon type mismatch means the cached daemon type is stale (e.g. the
+  server moved nodes); restart dinosteer.
+- **`[Hydrodactyl]` tool says it needs a Hydrodactyl panel**: that panel is configured (or defaulted) as
+  `pterodactyl`.
 - **Console tool hangs or times out**: the node hosting that server may be unreachable, or the
   websocket auth token expired — retry; connection has a 5s timeout and each call auto-closes the
   socket afterward.

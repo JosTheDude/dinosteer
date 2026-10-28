@@ -197,7 +197,7 @@ export function registerHydrodactylServerTools(server: McpServer, ctx: ToolConte
       ...eggChangeFields,
       dockerImage: z.string().optional(),
       startupCommand: z.string().max(2048).optional(),
-      environment: z.record(z.string().nullable()).optional(),
+      environment: z.record(z.string(), z.string().nullable()).optional(),
       shouldBackup: z.boolean().default(true),
       shouldWipe: z.boolean().default(false).describe("Delete all server files before reinstalling"),
       confirm: confirmField,
@@ -278,7 +278,7 @@ export function registerHydrodactylServerTools(server: McpServer, ctx: ToolConte
       panel: panelField,
       serverId: serverIdField,
       jobType: z.string(),
-      jobData: z.record(z.unknown()).default({}),
+      jobData: z.record(z.string(), z.unknown()).default({}),
       confirm: confirmField,
     },
     withToolErrorHandling(async ({ panel, serverId, jobType, jobData, confirm }) => {

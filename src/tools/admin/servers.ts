@@ -173,7 +173,7 @@ export function registerAdminServerTools(server: McpServer, ctx: ToolContext): v
       panel: panelField,
       serverId: serverIdField,
       startup: z.string(),
-      environment: z.record(z.string()).default({}),
+      environment: z.record(z.string(), z.string()).default({}),
       eggId: z.number().int(),
       image: z.string(),
       skipScripts: z.boolean().default(false),
