@@ -6,7 +6,7 @@ panel-wide administration (Application API), across as many named panels as you 
 
 ## Install & build
 
-Requires Node.js 18.17+ to run (22.12+ to run the test suite).
+Requires Node.js 20+ to run (22.12+ to run the test suite).
 
 ```bash
 npm install
